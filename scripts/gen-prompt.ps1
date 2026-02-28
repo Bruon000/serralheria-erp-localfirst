@@ -3,12 +3,12 @@ param([string]$CheckpointTag = '')
 $ErrorActionPreference = 'SilentlyContinue'
 $nl = [Environment]::NewLine
 
-function ReadFileRaw($p, $fallback) {
+function ReadFileRaw([string]$p, [string]$fallback) {
   if (Test-Path $p) { return (Get-Content $p -Raw) }
   return $fallback
 }
 
-function PortLine($port) {
+function PortLine([int]$port) {
   try {
     $ok = Test-NetConnection -ComputerName 'localhost' -Port $port -WarningAction SilentlyContinue
     if ($ok.TcpTestSucceeded) { return ('localhost:' + $port + ' OK') }
@@ -18,13 +18,16 @@ function PortLine($port) {
   }
 }
 
-function AppendBlock([System.Text.StringBuilder]$sb, [string]$text) {
-  if ([string]::IsNullOrWhiteSpace($text)) { return }
-  foreach ($line in ($text -split "`r?`n")) {
-    [void]$sb.AppendLine($line)
-  }
+function SplitLines([string]$text) {
+  if ($null -eq $text) { return @() }
+  return $text.Split(@("`r`n","`n","`r"), [System.StringSplitOptions]::None)
 }
 
+function AppendBlock([System.Text.StringBuilder]$sb, [string]$text) {
+  foreach ($line in (SplitLines $text)) { [void]$sb.AppendLine($line) }
+}
+
+# --- Git info (best-effort) ---
 $repoName = (Split-Path -Leaf (Get-Location))
 $branch = (git rev-parse --abbrev-ref HEAD) 2>$null
 $commit = (git rev-parse --short HEAD) 2>$null
@@ -42,15 +45,14 @@ $tags        = if ($tagsArr)        { $tagsArr        -join $nl } else { '(no ta
 $checklist = ReadFileRaw 'CHECKLIST.md' '(CHECKLIST.md not found)'
 $base      = ReadFileRaw 'PROMPT_BASE.md' '(PROMPT_BASE.md not found)'
 
+# --- Next step (linha: PRÓXIMO PASSO: ....) ---
 $nextStep = ''
-foreach ($l in ($checklist -split "`r?`n")) {
-  if ($l -match '^\s*(PR[ÓO]XIMO PASSO|PROXIMO PASSO)\s*:\s*(.+)\s*$') {
-    $nextStep = $Matches[2].Trim()
-    break
-  }
+foreach ($l in (SplitLines $checklist)) {
+  if ($l -match '^\s*(PR[ÓO]XIMO PASSO|PROXIMO PASSO)\s*:\s*(.+)\s*$') { $nextStep = $Matches[2].Trim(); break }
 }
 if (-not $nextStep) { $nextStep = '(adicione: PROXIMO PASSO: ... no CHECKLIST.md)' }
 
+# --- Ports / Docker ---
 $ports = @((PortLine 3001),(PortLine 5173),(PortLine 5432),(PortLine 5050)) -join $nl
 
 $dockerRunning = '(docker unavailable)'
@@ -60,14 +62,16 @@ try {
   else { $dockerRunning = '(docker ps empty)' }
 } catch {}
 
+# --- Build prompt (single file) ---
 $now = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 $outPath = 'prompt_pra_continuar.md'
 
 $sb = New-Object System.Text.StringBuilder
 
-[void]$sb.AppendLine('# PROMPT PRA CONTINUAR — ARQUIVO ÚNICO')
+[void]$sb.AppendLine('# PROMPT PRA CONTINUAR — ARQUIVO UNICO')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('Cole este arquivo inteiro em um novo chat para continuar o projeto.')
+[void]$sb.AppendLine('INSTRUCAO: copie e cole ESTE arquivo inteiro em um novo chat para continuar.')
+[void]$sb.AppendLine('IMPORTANTE: este repo deve ser operado com comandos PowerShell (sem edicao manual).')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('Generated: ' + $now)
 [void]$sb.AppendLine('Repo: ' + $repoName)

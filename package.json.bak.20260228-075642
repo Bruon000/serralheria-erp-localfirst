@@ -1,0 +1,28 @@
+{
+  "name": "serralheria-erp-localfirst",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r run build",
+    "db:reset": "pnpm docker:down:v && pnpm docker:up && pnpm prisma:migrate && pnpm prisma:seed",
+    "dev:api": "pnpm --filter api dev",
+    "docker:down:v": "docker-compose down -v",
+    "dev": "pnpm -r --parallel dev",
+    "build:api": "pnpm --filter api build",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json}\"",
+    "prisma:migrate": "pnpm --filter api exec prisma migrate dev",
+    "dev:web": "pnpm --filter web dev",
+    "lint": "pnpm -r run lint",
+    "prisma:generate": "pnpm --filter api exec prisma generate",
+    "docker:up": "docker-compose up -d",
+    "build:web": "pnpm --filter web build",
+    "docker:down": "docker-compose down",
+    "prisma:seed": "pnpm --filter api exec prisma db seed"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

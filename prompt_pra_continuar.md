@@ -1,12 +1,13 @@
-# PROMPT PRA CONTINUAR — ARQUIVO ÚNICO
+# PROMPT PRA CONTINUAR — ARQUIVO UNICO
 
-Cole este arquivo inteiro em um novo chat para continuar o projeto.
+INSTRUCAO: copie e cole ESTE arquivo inteiro em um novo chat para continuar.
+IMPORTANTE: este repo deve ser operado com comandos PowerShell (sem edicao manual).
 
-Generated: 2026-02-28 07:55:45
+Generated: 2026-02-28 08:04:46
 Repo: serralheria-erp-localfirst
 Branch: main
-HEAD: 49e3e4a
-Checkpoint: cp-029-fim-do-dia
+HEAD: 7727c32
+Checkpoint: cp-fix-prompt-final
 
 NEXT STEP: (adicione: PROXIMO PASSO: ... no CHECKLIST.md)
 
@@ -138,6 +139,17 @@ Depois:
 - Sync: last-write-wins + registrar conflitos em SyncConflict (mesmo que esqueleto).
 - Sempre atualizar CHECKLIST.md (marcar o que está pronto + próximos passos + bugs).
 - Não quebrar o que já está funcionando.
+---
+
+## REGRAS DE OPERACAO (IMPORTANTE - POWERSHELL)
+- **TUDO via PowerShell (Windows).** Sempre envie comandos PowerShell prontos pra copiar/colar.
+- **Nao pedir edicao manual** (ex: "abra no VSCode e edite"). Se precisar mudar arquivo, use comandos PowerShell (Set-Content / Add-Content / Replace / etc).
+- Quando sugerir passos, priorize:
+  1) comandos PowerShell
+  2) scripts em .\scripts\
+  3) salvar com checkpoint via .\scripts\savecp.ps1
+- O objetivo e sempre manter o repo “rodando” e o CHECKLIST.md atualizado.
+
 
 ```
 
@@ -811,13 +823,29 @@ git push --follow-tags
 
 
 
+
 ```
 
 ## 3) STATUS DO REPO (git)
 ```text
 ## main...origin/main
+ M .env.example
+ M CHECKLIST.md
+ M PROMPT_BASE.md
+ M apps/api/.env.example
+ M docker-compose.yml
+ M prompt_pra_continuar.md
+ M scripts/gen-prompt.ps1
+?? .env.example.bak.20260228-075641
+?? README.md.bak.20260228-075642
+?? apps/api/.env.example.bak.20260228-075642
+?? apps/web/.env.bak.20260228-075641
+?? apps/web/.env.example.bak.20260228-075641
+?? docker-compose.yml.bak.20260228-075641
+?? package.json.bak.20260228-075642
 
 LAST COMMITS:
+7727c32 chore: fim do dia
 49e3e4a m0: env examples + scripts + docker compose cleanup
 bedbd43 delima.orcamento.finalizado
 c479f35 chore: fim do dia
@@ -827,7 +855,6 @@ b3256e8 chore: checkpoint 2026-02-28 07:08
 18621c2 28.02
 f5ffc11 ultima
 b69808e chore: test auto prompt
-516fd0c mensagem
 
 TAGS:
 delima.orcamento.finalizado
@@ -854,10 +881,10 @@ localhost:5050 OK
 
 DOCKER:
 ```text
-- medusa-postgres
-- medusa-redis
 - serralheria-pgadmin
 - serralheria-postgres
+- medusa-postgres
+- medusa-redis
 - dolibarr
 - mariadb
 - frappe_docker-frontend-1

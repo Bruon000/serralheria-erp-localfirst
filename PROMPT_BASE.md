@@ -122,3 +122,14 @@ Depois:
 - Sync: last-write-wins + registrar conflitos em SyncConflict (mesmo que esqueleto).
 - Sempre atualizar CHECKLIST.md (marcar o que está pronto + próximos passos + bugs).
 - Não quebrar o que já está funcionando.
+---
+
+## REGRAS DE OPERACAO (IMPORTANTE - POWERSHELL)
+- **TUDO via PowerShell (Windows).** Sempre envie comandos PowerShell prontos pra copiar/colar.
+- **Nao pedir edicao manual** (ex: "abra no VSCode e edite"). Se precisar mudar arquivo, use comandos PowerShell (Set-Content / Add-Content / Replace / etc).
+- Quando sugerir passos, priorize:
+  1) comandos PowerShell
+  2) scripts em .\scripts\
+  3) salvar com checkpoint via .\scripts\savecp.ps1
+- O objetivo e sempre manter o repo “rodando” e o CHECKLIST.md atualizado.
+
