@@ -51,7 +51,8 @@ export function useSync() {
         body: JSON.stringify(payload),
       });
 
-      localStorage.setItem("lastSync", result.serverTime);
+            localStorage.setItem("lastSync", result.serverTime);
+      console.log("[SYNC] serverTime:", result.serverTime);
 
       // aplica changes vindos do servidor
       if (result.changes?.clients?.length) {
@@ -75,9 +76,11 @@ export function useSync() {
         }
       }
 
+            console.log("[SYNC] server deletes:", result.changes?.deletes?.length ?? 0, result.changes?.deletes);
+
       // aplica deletes vindos do servidor
-      if (result.deletes?.length) {
-        await applyServerDeletes(result.deletes);
+      if (result.changes.deletes?.length) {
+        await applyServerDeletes(result.changes.deletes);
       }
 
       // marca locais como sincronizados (upserts)
@@ -99,3 +102,5 @@ export function useSync() {
 
   return { sync, syncing };
 }
+
+

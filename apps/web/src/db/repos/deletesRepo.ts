@@ -27,6 +27,7 @@ export async function markDeletesSynced(ids: string[], serverTime: string) {
 }
 
 export async function applyServerDeletes(deletes: Array<{ entity: DeleteRecord["entity"]; entityId: string; deletedAt?: string | null }> ) {
+  console.log("[SYNC] applyServerDeletes() incoming:", deletes?.length ?? 0, deletes);
   await db.transaction("rw", db.clients, db.jobsites, db.quotes, db.quoteItems, async () => {
     for (const d of deletes) {
       const ts = d.deletedAt ?? nowIso();
@@ -37,3 +38,4 @@ export async function applyServerDeletes(deletes: Array<{ entity: DeleteRecord["
     }
   });
 }
+
