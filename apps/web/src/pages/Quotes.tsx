@@ -1,14 +1,16 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Box, Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogTitle,
-  TextField, Typography, List, ListItem, ListItemText, IconButton, MenuItem
+  TextField, Typography, List, ListItem, ListItemButton, ListItemText, IconButton, MenuItem
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { quotesRepo, type QuoteRow } from "@/db/repos/quotesRepo";
 import { clientsRepo } from "@/db/repos/clientsRepo";
 
 export function Quotes() {
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
 
@@ -73,16 +75,19 @@ export function Quotes() {
               {(quotes as any[]).map((q) => (
                 <ListItem
                   key={q.id}
+                  disablePadding
                   secondaryAction={
                     <IconButton edge="end" aria-label="delete" onClick={() => onDelete(q.id)}>
                       <DeleteIcon />
                     </IconButton>
                   }
                 >
-                  <ListItemText
-                    primary={`${clientMap.get(q.clientId)?.name ?? "Cliente"} • R$ ${Number(q.totalPrice ?? 0).toFixed(2)}`}
-                    secondary={`Status: ${q.status}`}
-                  />
+                  <ListItemButton onClick={() => navigate(`/quotes/${q.id}`)}>
+                    <ListItemText
+                      primary={`${clientMap.get(q.clientId)?.name ?? "Cliente"} • R$ ${Number(q.totalPrice ?? 0).toFixed(2)}`}
+                      secondary={`Status: ${q.status}`}
+                    />
+                  </ListItemButton>
                 </ListItem>
               ))}
             </List>
