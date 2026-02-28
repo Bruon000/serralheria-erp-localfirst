@@ -32,15 +32,31 @@ export class SyncService {
 
     const conflicts: { table: string; id: string; reason: string }[] = [];
 
-    // Processar mudanças de clients
+    
+
+function pickClientFields(row: any) {
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email ?? null,
+    phone: row.phone ?? null,
+    document: row.document ?? null,
+    address: row.address ?? null,
+    deletedAt: row.deletedAt ? new Date(row.deletedAt) : null,
+    version: row.version ?? 1,
+    deviceId: row.deviceId ?? null,
+  };
+}
+// Processar mudanças de clients
     if (changes.clients?.length) {
       for (const row of changes.clients) {
         try {
-          await this.prisma.client.upsert({
-            where: { id: row.id },
-            create: { ...row, companyId, lastSyncedAt: serverTime },
-            update: { ...row, lastSyncedAt: serverTime },
-          });
+          const data = pickClientFields(row);
+await this.prisma.client.upsert({
+  where: { id: data.id },
+  create: { ...data, companyId, lastSyncedAt: serverTime },
+  update: { ...data, lastSyncedAt: serverTime },
+});
         } catch (e) {
           conflicts.push({ table: "clients", id: row.id, reason: String(e) });
         }
@@ -130,4 +146,5 @@ export class SyncService {
     };
   }
 }
+
 

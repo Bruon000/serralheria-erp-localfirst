@@ -49,7 +49,17 @@ export function useSync() {
       const pendingQuoteItems = ((await (db as any).quoteItems?.toArray?.()) ?? []).filter((r: any) => r?.pendingSync === 1);
       const pendingDeletes = ((await (db as any).deletes?.toArray?.()) ?? []).filter((r: any) => r?.pendingSync === 1);
 
-      const payload = {
+      console.log("[SYNC] pending counts", {
+  clients: pendingClients.length,
+  jobsites: pendingJobsites.length,
+  quotes: pendingQuotes.length,
+  quoteItems: pendingQuoteItems.length,
+  deletes: pendingDeletes.length,
+});
+
+
+console.log("[SYNC] pending clients sample", (pendingClients ?? []).slice(0,5).map((c:any)=>({id:c.id,name:c.name,pendingSync:c.pendingSync,deletedAt:c.deletedAt})));
+const payload = {
         deviceId,
         lastSync: lastSync ?? null,
         changes: {
@@ -70,7 +80,10 @@ export function useSync() {
         body: JSON.stringify(payload),
       });
 
-      const serverTime = result.serverTime ?? new Date().toISOString();
+      
+console.log("[SYNC] conflicts", (result as any)?.conflicts ?? null);
+if (((result as any)?.conflicts ?? []).length) { console.table((result as any).conflicts); }
+const serverTime = result.serverTime ?? new Date().toISOString();
       const changes = (result as any)?.changes ?? {};
 
       if ((changes.clients ?? []).length) {
@@ -116,3 +129,6 @@ export function useSync() {
 
   return { sync, syncing };
 }
+
+
+
