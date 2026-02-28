@@ -3,6 +3,7 @@ import { apiJson } from "@/api/client";
 import { sync as syncEndpoint } from "@/api/endpoints";
 import { db } from "@/db/schema";
 import { getDeviceId } from "@/db/utils/deviceId";
+import { resetDbOnce } from "@/db/resetDb";
 
 type SyncResult = {
   serverTime: string;
@@ -42,11 +43,11 @@ export function useSync() {
       const deviceId = getDeviceId();
       const lastSync = localStorage.getItem(LAST_SYNC_KEY);
 
-      const pendingClients = (await (db as any).clients?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
-      const pendingJobsites = (await (db as any).jobsites?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
-      const pendingQuotes = (await (db as any).quotes?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
-      const pendingQuoteItems = (await (db as any).quoteItems?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
-      const pendingDeletes = (await (db as any).deletes?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
+      const pendingClients = ((await (db as any).clients?.toArray?.()) ?? []).filter((r: any) => r?.pendingSync === 1);
+      const pendingJobsites = ((await (db as any).jobsites?.toArray?.()) ?? []).filter((r: any) => r?.pendingSync === 1);
+      const pendingQuotes = ((await (db as any).quotes?.toArray?.()) ?? []).filter((r: any) => r?.pendingSync === 1);
+      const pendingQuoteItems = ((await (db as any).quoteItems?.toArray?.()) ?? []).filter((r: any) => r?.pendingSync === 1);
+      const pendingDeletes = ((await (db as any).deletes?.toArray?.()) ?? []).filter((r: any) => r?.pendingSync === 1);
 
       const payload = {
         deviceId,
@@ -97,7 +98,9 @@ export function useSync() {
       localStorage.setItem(LAST_SYNC_KEY, serverTime);
     } catch (e) {
       console.warn("[SYNC] failed", e);
-    } finally {
+      const msg = String((e as any)?.message ?? "");
+      if (msg.includes("pendingSync") && msg.includes("not indexed")) { await resetDbOnce(); }
+} finally {
       runningRef.current = false;
       setSyncing(false);
     }
@@ -111,3 +114,7 @@ export function useSync() {
 
   return { sync, syncing };
 }
+
+
+
+
