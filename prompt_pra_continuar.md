@@ -1,23 +1,15 @@
-# PROMPT PRA CONTINUAR — serralheria-erp-localfirst (ARQUIVO ÚNICO)
+# PROMPT PRA CONTINUAR (SINGLE FILE)
 
-✅ Copie e cole ESTE arquivo inteiro em um novo chat para continuar o projeto.
-✅ Esse arquivo é atualizado quando você salvar (commit/checkpoint).
+Generated: 2026-02-28 06:43:12
+Repo: serralheria-erp-localfirst
+Branch: main
+HEAD: 516fd0c
+Checkpoint: 
 
-Gerado em: **2026-02-28 06:21:16**
-Repo: **serralheria-erp-localfirst**
-Branch: **main**
-HEAD: **3cc631a**
-Checkpoint/tag (se informado): ****
+NEXT STEP: (add PROXIMO PASSO: ... in CHECKLIST.md)
 
----
-
-## 1) ONDE PARAMOS / PRÓXIMO PASSO
-**PRÓXIMO PASSO:** (adicione no CHECKLIST.md uma linha: PRÓXIMO PASSO: ...)
-
----
-
-## 2) CHECKLIST ATUAL (copiado do CHECKLIST.md)
-`markdown
+-----
+CHECKLIST:
 \# CHECKLIST — serralheria-erp-localfirst (vivo)
 
 
@@ -683,40 +675,34 @@ git commit -m "cp-003: clientes offline + sync ok"
 git tag cp-003-clientes-offline
 
 git push --follow-tags
-`$nl
----
-
-## 3) STATUS DO REPO (git)
-`	ext
+-----
+GIT STATUS:
 ## main...origin/main
-?? prompt_pra_continuar.md
-?? scripts/gen-prompt.ps1
+ M prompt_pra_continuar.md
+ M scripts/gen-prompt.ps1
+ M scripts/savecp.ps1
 
-Últimos commits:
+LAST COMMITS:
+516fd0c mensagem
 3cc631a chore: improve status script
 d7ec990 chore: add status script
 de36d2c feat: clientes offline
 64c9d20 docs: update checklist
 7353bd1 chore: initial commit
 
-Checkpoints/tags:
+TAGS:
+cp-xxx
 cp-003-status-improved
 cp-002-status-script
 cp-001-clientes-offline
-`$nl
----
-
-## 4) SAÚDE DO AMBIENTE (best-effort)
-
-### Portas
-`	ext
-localhost:3001 ✅
-localhost:5173 ❌
-localhost:5432 ✅
-localhost:5050 ✅
-`$nl
-### Docker containers (rodando)
-`	ext
+-----
+PORTS:
+localhost:3001 OK
+localhost:5173 FAIL
+localhost:5432 OK
+localhost:5050 OK
+-----
+DOCKER:
 - medusa-postgres
 - medusa-redis
 - serralheria-pgadmin
@@ -729,33 +715,4 @@ localhost:5050 ✅
 - frappe_docker-queue-long-1
 - frappe_docker-scheduler-1
 - frappe_docker-queue-short-1
-`$nl
----
 
-## 5) COMO SUBIR TUDO (Windows - PowerShell)
-> Rode na raiz do repo (onde está o package.json)
-
-`powershell
-pnpm install
-if (!(Test-Path ''.env'')) { copy .env.example .env }
-
-pnpm docker:up
-
-cd apps\api
-copy ..\..\.env .\.env
-pnpm prisma:generate
-pnpm prisma:migrate
-pnpm prisma:seed
-cd ..\..
-
-# 2 terminais:
-pnpm dev:api
-pnpm dev:web
-`$nl
----
-
-## 6) COMO SALVAR + CHECKPOINT (padrão do projeto)
-`powershell
-.\scripts\savecp.ps1 "mensagem do commit"
-.\scripts\savecp.ps1 "mensagem do commit" "cp-XXX-descricao"
-`$nl
