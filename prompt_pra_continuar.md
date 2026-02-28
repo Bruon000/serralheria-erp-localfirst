@@ -2,11 +2,11 @@
 
 Cole este arquivo inteiro em um novo chat para continuar o projeto.
 
-Generated: 2026-02-28 07:31:15
+Generated: 2026-02-28 07:34:47
 Repo: serralheria-erp-localfirst
 Branch: main
-HEAD: bb82fb3
-Checkpoint: cp-fix-genprompt-format
+HEAD: 687ffa0
+Checkpoint: cp-029-fim-do-dia
 
 NEXT STEP: (adicione: PROXIMO PASSO: ... no CHECKLIST.md)
 
@@ -815,10 +815,9 @@ git push --follow-tags
 ## 3) STATUS DO REPO (git)
 ```text
 ## main...origin/main
- M prompt_pra_continuar.md
- M scripts/gen-prompt.ps1
 
 LAST COMMITS:
+687ffa0 chore: fix gen-prompt formatting
 bb82fb3 28.02v2
 b3256e8 chore: checkpoint 2026-02-28 07:08
 18621c2 28.02
@@ -828,9 +827,9 @@ b69808e chore: test auto prompt
 3cc631a chore: improve status script
 d7ec990 chore: add status script
 de36d2c feat: clientes offline
-64c9d20 docs: update checklist
 
 TAGS:
+cp-fix-genprompt-format
 cp-28.02v1
 cp-20260228-0708
 cp-28.02
