@@ -2,10 +2,10 @@
 
 Cole este arquivo inteiro em um novo chat para continuar o projeto.
 
-Generated: 2026-02-28 07:34:47
+Generated: 2026-02-28 07:55:45
 Repo: serralheria-erp-localfirst
 Branch: main
-HEAD: 687ffa0
+HEAD: 49e3e4a
 Checkpoint: cp-029-fim-do-dia
 
 NEXT STEP: (adicione: PROXIMO PASSO: ... no CHECKLIST.md)
@@ -810,6 +810,7 @@ git tag cp-003-clientes-offline
 git push --follow-tags
 
 
+
 ```
 
 ## 3) STATUS DO REPO (git)
@@ -817,6 +818,9 @@ git push --follow-tags
 ## main...origin/main
 
 LAST COMMITS:
+49e3e4a m0: env examples + scripts + docker compose cleanup
+bedbd43 delima.orcamento.finalizado
+c479f35 chore: fim do dia
 687ffa0 chore: fix gen-prompt formatting
 bb82fb3 28.02v2
 b3256e8 chore: checkpoint 2026-02-28 07:08
@@ -824,11 +828,10 @@ b3256e8 chore: checkpoint 2026-02-28 07:08
 f5ffc11 ultima
 b69808e chore: test auto prompt
 516fd0c mensagem
-3cc631a chore: improve status script
-d7ec990 chore: add status script
-de36d2c feat: clientes offline
 
 TAGS:
+delima.orcamento.finalizado
+cp-029-fim-do-dia
 cp-fix-genprompt-format
 cp-28.02v1
 cp-20260228-0708
@@ -843,7 +846,7 @@ cp-001-clientes-offline
 ## 4) AMBIENTE (best-effort)
 PORTS:
 ```text
-localhost:3001 OK
+localhost:3001 FAIL
 localhost:5173 FAIL
 localhost:5432 OK
 localhost:5050 OK
