@@ -1,106 +1,93 @@
-import { useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { apiJson } from "@/api/client";
-import { sync as syncUrl } from "@/api/endpoints";
-import { db } from "@/db";
-import { getDeviceId } from "@/db/utils/device";
-import { getPendingDeletes, markDeletesSynced, applyServerDeletes } from "@/db/repos/deletesRepo";
+import { sync as syncEndpoint } from "@/api/endpoints";
+
+
+import { db } from "@/db/schema";
+type SyncResult = {
+  serverTime?: string;
+  changes?: {
+    clients?: any[];
+    jobsites?: any[];
+    quotes?: any[];
+    quoteItems?: any[];
+    deletes?: { entity: string; entityId: string; deletedAt?: string }[];
+  };
+};
+
+async function applyServerDeletes(deletes: { entity: string; entityId: string }[]) {
+  for (const d of deletes) {
+    if (!d?.entity || !d?.entityId) continue;
+    try {
+      const table = (db as any)[d.entity];
+      if (table?.delete) await table.delete(d.entityId);
+    } catch {
+      // ignora entidades desconhecidas
+    }
+  }
+}
 
 export function useSync() {
+  const runningRef = useRef(false);
   const [syncing, setSyncing] = useState(false);
 
   const sync = useCallback(async () => {
+    if (runningRef.current) return;
+    runningRef.current = true;
     setSyncing(true);
+
     try {
-      const deviceId = getDeviceId();
-      const lastSync = localStorage.getItem("lastSync");
-
-      const localClients = await db.clients.where("pendingSync").equals(1).toArray();
-      const localJobsites = await db.jobsites.where("pendingSync").equals(1).toArray();
-      const localQuotes = await db.quotes.where("pendingSync").equals(1).toArray();
-      const localQuoteItems = await db.quoteItems.where("pendingSync").equals(1).toArray();
-      const localDeletes = await getPendingDeletes();
-
-      const payload = {
-        lastSync: lastSync || null,
-        deviceId,
-        changes: {
-          clients: localClients,
-          jobsites: localJobsites,
-          quotes: localQuotes,
-          quoteItems: localQuoteItems,
-        },
-        deletes: localDeletes.map((d) => ({
-          entity: d.entity,
-          entityId: d.entityId,
-          deletedAt: d.deletedAt,
-          companyId: d.companyId ?? null,
-        })),
+      const pending = {
+        clients: (await (db as any).clients?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
+        jobsites: (await (db as any).jobsites?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
+        quotes: (await (db as any).quotes?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
+        quoteItems: (await (db as any).quoteItems?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
+        deletes: (await (db as any).deletes?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
       };
 
-      const result = await apiJson<{
-        serverTime: string;
-        changes?: {
-          clients?: any[];
-          jobsites?: any[];
-          quotes?: any[];
-          quoteItems?: any[];
-        };
-        deletes?: Array<{ entity: "clients" | "jobsites" | "quotes" | "quoteItems"; entityId: string; deletedAt?: string | null }>;
-      }>(syncUrl, {
+      const result = await apiJson<SyncResult>(syncEndpoint, {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(pending),
       });
 
-            localStorage.setItem("lastSync", result.serverTime);
-      console.log("[SYNC] serverTime:", result.serverTime);
+      const changes = (result as any)?.changes ?? {};
+      const serverTime = (result as any)?.serverTime ?? new Date().toISOString();
 
-      // aplica changes vindos do servidor
-      if (result.changes?.clients?.length) {
-        for (const row of result.changes.clients) {
-          await db.clients.put({ ...row, pendingSync: 0, lastSyncedAt: result.serverTime });
-        }
+      for (const row of (changes.clients ?? [])) {
+        await (db as any).clients.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
       }
-      if (result.changes?.jobsites?.length) {
-        for (const row of result.changes.jobsites) {
-          await db.jobsites.put({ ...row, pendingSync: 0, lastSyncedAt: result.serverTime });
-        }
+      for (const row of (changes.jobsites ?? [])) {
+        await (db as any).jobsites.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
       }
-      if (result.changes?.quotes?.length) {
-        for (const row of result.changes.quotes) {
-          await db.quotes.put({ ...row, pendingSync: 0, lastSyncedAt: result.serverTime });
-        }
+      for (const row of (changes.quotes ?? [])) {
+        await (db as any).quotes.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
       }
-      if (result.changes?.quoteItems?.length) {
-        for (const row of result.changes.quoteItems) {
-          await db.quoteItems.put({ ...row, pendingSync: 0, lastSyncedAt: result.serverTime });
-        }
+      for (const row of (changes.quoteItems ?? [])) {
+        await (db as any).quoteItems.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
       }
 
-            console.log("[SYNC] server deletes:", result.changes?.deletes?.length ?? 0, result.changes?.deletes);
-
-      // aplica deletes vindos do servidor
-      if (result.changes.deletes?.length) {
-        await applyServerDeletes(result.changes.deletes);
+      if ((changes.deletes ?? []).length) {
+        await applyServerDeletes(changes.deletes ?? []);
       }
-
-      // marca locais como sincronizados (upserts)
-      await db.transaction("rw", db.clients, db.jobsites, db.quotes, db.quoteItems, async () => {
-        for (const c of localClients) await db.clients.update(c.id, { pendingSync: 0, lastSyncedAt: result.serverTime });
-        for (const j of localJobsites) await db.jobsites.update(j.id, { pendingSync: 0, lastSyncedAt: result.serverTime });
-        for (const q of localQuotes) await db.quotes.update(q.id, { pendingSync: 0, lastSyncedAt: result.serverTime });
-        for (const i of localQuoteItems) await db.quoteItems.update(i.id, { pendingSync: 0, lastSyncedAt: result.serverTime });
-      });
-
-      // marca fila de deletes como sincronizada
-      if (localDeletes.length) {
-        await markDeletesSynced(localDeletes.map((d) => d.id), result.serverTime);
-      }
+    } catch (e) {
+      console.warn("[SYNC] failed", e);
     } finally {
+      runningRef.current = false;
       setSyncing(false);
     }
   }, []);
 
+  // auto-sync ao montar + a cada 30s
+  useEffect(() => {
+    sync();
+    const t = setInterval(sync, 30_000);
+    return () => clearInterval(t);
+  }, [sync]);
+
   return { sync, syncing };
 }
+
+
+
 
 
