@@ -1,0 +1,1 @@
+export interface ActivityEvent {  id: string;  companyId: string;  type: string;  entityType: string;  entityId: string;  userId: string;  payload: Record<string, unknown>;  createdAt: Date;}

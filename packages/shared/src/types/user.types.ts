@@ -1,0 +1,1 @@
+export type Role = "ADMIN" | "LOJA" | "VENDEDOR" | "CONTADOR";export interface User {  id: string;  email: string;  name: string;  role: Role;  companyId: string;  createdAt: Date;  updatedAt: Date;}

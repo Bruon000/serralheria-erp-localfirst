@@ -1,0 +1,1 @@
+import { IsString, IsBoolean, IsOptional, IsInt, IsIn } from "class-validator";export class CreateCustomFieldDto {  @IsString()  @IsIn(["Client", "JobSite", "Quote"])  entity: string;  @IsString()  name: string;  @IsString()  type: string;  @IsOptional()  @IsBoolean()  required?: boolean;  @IsOptional()  @IsString()  options?: string;  @IsOptional()  @IsInt()  order?: number;}

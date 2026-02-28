@@ -1,0 +1,1 @@
+import { IsString, IsOptional, IsUUID } from "class-validator";export class CreateJobSiteDto {  @IsUUID()  clientId: string;  @IsString()  name: string;  @IsOptional()  @IsString()  address?: string;}

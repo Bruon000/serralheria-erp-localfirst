@@ -1,0 +1,1 @@
+import { Module } from "@nestjs/common";import { QuoteItemsService } from "./quote-items.service";@Module({  providers: [QuoteItemsService],  exports: [QuoteItemsService],})export class QuoteItemsModule {}

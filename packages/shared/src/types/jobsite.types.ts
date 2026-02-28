@@ -1,0 +1,1 @@
+export interface JobSite {  id: string;  companyId: string;  clientId: string;  name: string;  address: string | null;  createdAt: Date;  updatedAt: Date;  deletedAt: Date | null;  version: number;  deviceId: string | null;  lastSyncedAt: Date | null;}

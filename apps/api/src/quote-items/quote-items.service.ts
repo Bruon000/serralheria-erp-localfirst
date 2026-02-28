@@ -1,0 +1,1 @@
+import { Injectable } from "@nestjs/common";import { PrismaService } from "../prisma/prisma.service";@Injectable()export class QuoteItemsService {  constructor(private prisma: PrismaService) {}  async findByQuoteId(quoteId: string) {    return this.prisma.quoteItem.findMany({      where: { quoteId, deletedAt: null },      orderBy: { createdAt: "asc" },    });  }}

@@ -1,0 +1,1 @@
+export interface WorkflowState {  id: string;  workflowId: string;  name: string;  order: number;}export interface WorkflowTransition {  id: string;  fromStateId: string;  toStateId: string;  allowedRoles: string[];}export interface Workflow {  id: string;  companyId: string;  name: string;  entity: string;  states: WorkflowState[];  transitions: WorkflowTransition[];}

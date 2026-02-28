@@ -1,0 +1,286 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id            String          @id @default(uuid())
+  name          String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  users         User[]
+  clients       Client[]
+  jobSites      JobSite[]
+  quotes        Quote[]
+  customFields  CustomField[]
+  workflows     Workflow[]
+  templates     Template[]
+  syncDevices   SyncDevice[]
+  syncConflicts SyncConflict[]
+  activityEvents ActivityEvent[]
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         String
+
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  activityEvents ActivityEvent[]
+}
+
+model Client {
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name         String
+  email        String?
+  phone        String?
+  document     String?
+  address      String?
+
+  version      Int         @default(1)
+  deviceId     String?
+  lastSyncedAt DateTime?
+  deletedAt    DateTime?
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  jobSites     JobSite[]
+  quotes       Quote[]
+  customFieldValues CustomFieldValue[]
+}
+
+model JobSite {
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  clientId     String
+  client       Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  name         String
+  address      String?
+
+  version      Int         @default(1)
+  deviceId     String?
+  lastSyncedAt DateTime?
+  deletedAt    DateTime?
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  quotes       Quote[]
+  customFieldValues CustomFieldValue[]
+}
+
+model Quote {
+  id           String      @id @default(uuid())
+  companyId    String
+  company      Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  clientId     String
+  client       Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  jobSiteId    String?
+  jobSite      JobSite?    @relation(fields: [jobSiteId], references: [id], onDelete: SetNull)
+
+  status       String      @default("DRAFT")
+  subtotal     Decimal     @db.Decimal(14, 2)
+  total        Decimal     @db.Decimal(14, 2)
+  marginPct    Decimal     @db.Decimal(8, 2)
+
+  version      Int         @default(1)
+  deviceId     String?
+  lastSyncedAt DateTime?
+  deletedAt    DateTime?
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  items        QuoteItem[]
+  customFieldValues CustomFieldValue[]
+}
+
+model QuoteItem {
+  id           String      @id @default(uuid())
+
+  quoteId      String
+  quote        Quote       @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  description  String
+  width        Decimal?    @db.Decimal(10, 2)
+  height       Decimal?    @db.Decimal(10, 2)
+  unit         String
+  finish       String?
+  qty          Int
+  cost         Decimal     @db.Decimal(14, 2)
+  price        Decimal     @db.Decimal(14, 2)
+  marginPct    Decimal     @db.Decimal(8, 2)
+
+  version      Int         @default(1)
+  deviceId     String?
+  lastSyncedAt DateTime?
+  deletedAt    DateTime?
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model CustomField {
+  id          String      @id @default(uuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  entity      String
+  name        String
+  type        String
+  required    Boolean     @default(false)
+  options     String?
+  order       Int         @default(0)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  values      CustomFieldValue[]
+}
+
+model CustomFieldValue {
+  id            String      @id @default(uuid())
+
+  customFieldId String
+  customField   CustomField @relation(fields: [customFieldId], references: [id], onDelete: Cascade)
+
+  entityId      String
+  value         String      @db.Text
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  clientId      String?
+  client        Client?     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  jobSiteId     String?
+  jobSite       JobSite?    @relation(fields: [jobSiteId], references: [id], onDelete: Cascade)
+
+  quoteId       String?
+  quote         Quote?      @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+model Workflow {
+  id          String      @id @default(uuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name        String
+  entity      String
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  states      WorkflowState[]
+  transitions WorkflowTransition[]
+}
+
+model WorkflowState {
+  id          String      @id @default(uuid())
+
+  workflowId  String
+  workflow    Workflow    @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  name        String
+  order       Int         @default(0)
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  fromTransitions WorkflowTransition[] @relation("FromState")
+  toTransitions   WorkflowTransition[] @relation("ToState")
+}
+
+model WorkflowTransition {
+  workflowId   String
+  workflow     Workflow      @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+id           String       @id @default(uuid())
+
+  fromStateId  String
+  fromState    WorkflowState @relation("FromState", fields: [fromStateId], references: [id], onDelete: Cascade)
+
+  toStateId    String
+  toState      WorkflowState @relation("ToState", fields: [toStateId], references: [id], onDelete: Cascade)
+
+  allowedRoles String[]
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Template {
+  id          String      @id @default(uuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  name        String
+  type        String
+  content     String      @db.Text
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model SyncDevice {
+  id          String      @id @default(uuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  deviceId    String      @unique
+  name        String?
+  lastSync    DateTime?
+
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model SyncConflict {
+  id          String      @id @default(uuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  tableName   String
+  recordId    String
+  reason      String      @db.Text
+  payload     Json?
+
+  createdAt   DateTime    @default(now())
+}
+
+model ActivityEvent {
+  id          String      @id @default(uuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  type        String
+  entityType  String
+  entityId    String
+
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  payload     Json?
+  createdAt   DateTime    @default(now())
+}

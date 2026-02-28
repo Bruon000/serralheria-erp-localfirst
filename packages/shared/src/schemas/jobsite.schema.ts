@@ -1,0 +1,1 @@
+import { z } from "zod";export const jobSiteSchema = z.object({  clientId: z.string().uuid(),  name: z.string().min(1, "Nome obrigatório"),  address: z.string().optional(),});export type JobSiteInput = z.infer<typeof jobSiteSchema>;

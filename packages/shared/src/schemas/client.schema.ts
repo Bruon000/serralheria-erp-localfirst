@@ -1,0 +1,1 @@
+import { z } from "zod";export const clientSchema = z.object({  name: z.string().min(1, "Nome obrigatório"),  email: z.string().email().optional().or(z.literal("")),  phone: z.string().optional(),  document: z.string().optional(),  address: z.string().optional(),});export type ClientInput = z.infer<typeof clientSchema>;

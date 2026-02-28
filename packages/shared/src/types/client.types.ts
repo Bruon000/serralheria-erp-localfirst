@@ -1,0 +1,1 @@
+export interface Client {  id: string;  companyId: string;  name: string;  email: string | null;  phone: string | null;  document: string | null;  address: string | null;  createdAt: Date;  updatedAt: Date;  deletedAt: Date | null;  version: number;  deviceId: string | null;  lastSyncedAt: Date | null;}
