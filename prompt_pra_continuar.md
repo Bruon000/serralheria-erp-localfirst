@@ -1,12 +1,12 @@
-# PROMPT PRA CONTINUAR — ARQUIVO UNICO
+# PROMPT PRA CONTINUAR — ARQUIVO ÚNICO
 
 Cole este arquivo inteiro em um novo chat para continuar o projeto.
 
-Generated: 2026-02-28 07:25:59
+Generated: 2026-02-28 07:31:15
 Repo: serralheria-erp-localfirst
 Branch: main
-HEAD: b3256e8
-Checkpoint: cp-28.02v1
+HEAD: bb82fb3
+Checkpoint: cp-fix-genprompt-format
 
 NEXT STEP: (adicione: PROXIMO PASSO: ... no CHECKLIST.md)
 
@@ -138,6 +138,7 @@ Depois:
 - Sync: last-write-wins + registrar conflitos em SyncConflict (mesmo que esqueleto).
 - Sempre atualizar CHECKLIST.md (marcar o que está pronto + próximos passos + bugs).
 - Não quebrar o que já está funcionando.
+
 ```
 
 ## 2) CHECKLIST ATUAL (CHECKLIST.md)
@@ -807,6 +808,8 @@ git commit -m "cp-003: clientes offline + sync ok"
 git tag cp-003-clientes-offline
 
 git push --follow-tags
+
+
 ```
 
 ## 3) STATUS DO REPO (git)
@@ -814,9 +817,9 @@ git push --follow-tags
 ## main...origin/main
  M prompt_pra_continuar.md
  M scripts/gen-prompt.ps1
-?? PROMPT_BASE.md
 
 LAST COMMITS:
+bb82fb3 28.02v2
 b3256e8 chore: checkpoint 2026-02-28 07:08
 18621c2 28.02
 f5ffc11 ultima
@@ -826,9 +829,9 @@ b69808e chore: test auto prompt
 d7ec990 chore: add status script
 de36d2c feat: clientes offline
 64c9d20 docs: update checklist
-7353bd1 chore: initial commit
 
 TAGS:
+cp-28.02v1
 cp-20260228-0708
 cp-28.02
 ultimadanoite28;02

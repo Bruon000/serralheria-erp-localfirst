@@ -18,6 +18,13 @@ function PortLine($port) {
   }
 }
 
+function AppendBlock([System.Text.StringBuilder]$sb, [string]$text) {
+  if ([string]::IsNullOrWhiteSpace($text)) { return }
+  foreach ($line in ($text -split "`r?`n")) {
+    [void]$sb.AppendLine($line)
+  }
+}
+
 $repoName = (Split-Path -Leaf (Get-Location))
 $branch = (git rev-parse --abbrev-ref HEAD) 2>$null
 $commit = (git rev-parse --short HEAD) 2>$null
@@ -36,7 +43,7 @@ $checklist = ReadFileRaw 'CHECKLIST.md' '(CHECKLIST.md not found)'
 $base      = ReadFileRaw 'PROMPT_BASE.md' '(PROMPT_BASE.md not found)'
 
 $nextStep = ''
-foreach ($l in ($checklist -split $nl)) {
+foreach ($l in ($checklist -split "`r?`n")) {
   if ($l -match '^\s*(PR[ÓO]XIMO PASSO|PROXIMO PASSO)\s*:\s*(.+)\s*$') {
     $nextStep = $Matches[2].Trim()
     break
@@ -58,7 +65,7 @@ $outPath = 'prompt_pra_continuar.md'
 
 $sb = New-Object System.Text.StringBuilder
 
-[void]$sb.AppendLine('# PROMPT PRA CONTINUAR — ARQUIVO UNICO')
+[void]$sb.AppendLine('# PROMPT PRA CONTINUAR — ARQUIVO ÚNICO')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('Cole este arquivo inteiro em um novo chat para continuar o projeto.')
 [void]$sb.AppendLine('')
@@ -75,37 +82,37 @@ $sb = New-Object System.Text.StringBuilder
 
 [void]$sb.AppendLine('## 1) BASE FIXA DO PROJETO (PROMPT_BASE.md)')
 [void]$sb.AppendLine('```markdown')
-[void]$sb.AppendLine($base.TrimEnd())
+AppendBlock $sb $base
 [void]$sb.AppendLine('```')
 [void]$sb.AppendLine('')
 
 [void]$sb.AppendLine('## 2) CHECKLIST ATUAL (CHECKLIST.md)')
 [void]$sb.AppendLine('```markdown')
-[void]$sb.AppendLine($checklist.TrimEnd())
+AppendBlock $sb $checklist
 [void]$sb.AppendLine('```')
 [void]$sb.AppendLine('')
 
 [void]$sb.AppendLine('## 3) STATUS DO REPO (git)')
 [void]$sb.AppendLine('```text')
-[void]$sb.AppendLine($gitStatus.TrimEnd())
+AppendBlock $sb $gitStatus
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('LAST COMMITS:')
-[void]$sb.AppendLine($lastCommits.TrimEnd())
+AppendBlock $sb $lastCommits
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('TAGS:')
-[void]$sb.AppendLine($tags.TrimEnd())
+AppendBlock $sb $tags
 [void]$sb.AppendLine('```')
 [void]$sb.AppendLine('')
 
 [void]$sb.AppendLine('## 4) AMBIENTE (best-effort)')
 [void]$sb.AppendLine('PORTS:')
 [void]$sb.AppendLine('```text')
-[void]$sb.AppendLine($ports.TrimEnd())
+AppendBlock $sb $ports
 [void]$sb.AppendLine('```')
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine('DOCKER:')
 [void]$sb.AppendLine('```text')
-[void]$sb.AppendLine($dockerRunning.TrimEnd())
+AppendBlock $sb $dockerRunning
 [void]$sb.AppendLine('```')
 [void]$sb.AppendLine('')
 
