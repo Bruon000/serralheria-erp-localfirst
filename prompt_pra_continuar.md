@@ -3,10 +3,10 @@
 INSTRUCAO: copie e cole ESTE arquivo inteiro em um novo chat para continuar.
 IMPORTANTE: este repo deve ser operado com comandos PowerShell (sem edicao manual).
 
-Generated: 2026-02-28 12:05:15
+Generated: 2026-02-28 14:33:32
 Repo: serralheria-erp-localfirst
 Branch: main
-HEAD: d178baf
+HEAD: d553a84
 Checkpoint: cp-029-fim-do-dia
 
 NEXT STEP: (adicione: PROXIMO PASSO: ... no CHECKLIST.md)
@@ -833,9 +833,12 @@ git push --follow-tags
 
 ## 3) STATUS DO REPO (git)
 ```text
-## main...origin/main [ahead 1]
+## main...origin/main
 
 LAST COMMITS:
+d553a84 delima.m1.sync.v1: schema Dexie v2 + repos base + utils (deviceId/companyId/nowIso) + sync payload alinhado + deletes entity/entityId
+98d726a delima.orcamento.finalizado: fix build (vite/ts), proxy /api, sync hook e dexie schema ESM; migrar pnpm->npm
+832cb1a chore: fim do dia
 d178baf sync-service-deletes-lastSyncDate-update
 bf062d2 chore: update CHECKLIST (M0 done + status cp-001)
 624ee22 cp-001: dexie infra (schema v2 + deletes queue + repos + utils + useSync deletes)
@@ -843,11 +846,9 @@ bf062d2 chore: update CHECKLIST (M0 done + status cp-001)
 b3e8a71 chore: add env examples (root/web/api)
 1141842 chore: fix prompt final
 7727c32 chore: fim do dia
-49e3e4a m0: env examples + scripts + docker compose cleanup
-bedbd43 delima.orcamento.finalizado
-c479f35 chore: fim do dia
 
 TAGS:
+delima.m1.sync.v1
 sync-service-deletes-lastSyncDate-update
 cp-001-dexie-infra
 cp-fix-prompt-final
@@ -867,7 +868,7 @@ cp-001-clientes-offline
 ## 4) AMBIENTE (best-effort)
 PORTS:
 ```text
-localhost:3001 FAIL
+localhost:3001 OK
 localhost:5173 OK
 localhost:5432 OK
 localhost:5050 OK
