@@ -99,8 +99,10 @@ export function useSync() {
     } catch (e) {
       console.warn("[SYNC] failed", e);
       const msg = String((e as any)?.message ?? "");
-      if (msg.includes("pendingSync") && msg.includes("not indexed")) { await resetDbOnce(); }
-} finally {
+      if (msg.includes("pendingSync") && msg.includes("not indexed")) {
+        await resetDbOnce();
+      }
+    } finally {
       runningRef.current = false;
       setSyncing(false);
     }
@@ -114,6 +116,7 @@ export function useSync() {
 
   return { sync, syncing };
 }
+
 
 
 
