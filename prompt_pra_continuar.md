@@ -1,10 +1,10 @@
 # PROMPT PRA CONTINUAR (SINGLE FILE)
 
-Generated: 2026-02-28 07:06:20
+Generated: 2026-02-28 07:08:28
 Repo: serralheria-erp-localfirst
 Branch: main
-HEAD: f5ffc11
-Checkpoint: cp-28.02
+HEAD: 18621c2
+Checkpoint: cp-20260228-0708
 
 NEXT STEP: (add PROXIMO PASSO: ... in CHECKLIST.md)
 
@@ -680,6 +680,7 @@ GIT STATUS:
 ## main...origin/main
 
 LAST COMMITS:
+18621c2 28.02
 f5ffc11 ultima
 b69808e chore: test auto prompt
 516fd0c mensagem
@@ -690,6 +691,7 @@ de36d2c feat: clientes offline
 7353bd1 chore: initial commit
 
 TAGS:
+cp-28.02
 ultimadanoite28;02
 cp-xxx
 cp-003-status-improved
