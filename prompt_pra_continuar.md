@@ -3,10 +3,10 @@
 INSTRUCAO: copie e cole ESTE arquivo inteiro em um novo chat para continuar.
 IMPORTANTE: este repo deve ser operado com comandos PowerShell (sem edicao manual).
 
-Generated: 2026-02-28 14:33:32
+Generated: 2026-02-28 18:00:42
 Repo: serralheria-erp-localfirst
 Branch: main
-HEAD: d553a84
+HEAD: 5912f3a
 Checkpoint: cp-029-fim-do-dia
 
 NEXT STEP: (adicione: PROXIMO PASSO: ... no CHECKLIST.md)
@@ -821,11 +821,24 @@ git tag cp-003-clientes-offline
 
 git push --follow-tags
 
+## Release - delima.release.v1
 
+### ✅ Infra / Dev
+- [x] Web: React + Vite + TS + MUI + TanStack Query
+- [x] API: NestJS + Prisma + Postgres
+- [x] VITE_API_URL=/api + proxy (/api -> 3001)
+- [x] api client suporta base relativa (/api)
 
+### ✅ Local-first (Dexie)
+- [x] Dexie schema v4 (PK id uuid string) + índices pendingSync/updatedAt/deletedAt
+- [x] resetDb=1 em DEV (forceResetDb) para limpar IndexedDB
+- [x] Páginas local-first: Clientes, Obras, Orçamentos, Detalhe Orçamento (itens)
 
-
-
+### ✅ Sync
+- [x] /sync protegido por JWT
+- [x] useSync envia changes e aplica serverChanges (bulkPut/bulkDelete)
+- [x] Backend sanitiza payload (remove campos locais como pendingSync) antes do Prisma upsert
+- [x] Validação real: clientes criados no Dexie sincronizam e aparecem em GET /clients
 
 
 
@@ -836,18 +849,31 @@ git push --follow-tags
 ## main...origin/main
 
 LAST COMMITS:
-d553a84 delima.m1.sync.v1: schema Dexie v2 + repos base + utils (deviceId/companyId/nowIso) + sync payload alinhado + deletes entity/entityId
-98d726a delima.orcamento.finalizado: fix build (vite/ts), proxy /api, sync hook e dexie schema ESM; migrar pnpm->npm
-832cb1a chore: fim do dia
-d178baf sync-service-deletes-lastSyncDate-update
-bf062d2 chore: update CHECKLIST (M0 done + status cp-001)
-624ee22 cp-001: dexie infra (schema v2 + deletes queue + repos + utils + useSync deletes)
-58353d3 docs: update checklist + add README setup
-b3e8a71 chore: add env examples (root/web/api)
-1141842 chore: fix prompt final
-7727c32 chore: fim do dia
+5912f3a delima.release.v1: checklist final + valida├º├úo sync local-first
+90358e7 delima.m3.sync.v12: SyncService sanitiza payload (remove pendingSync etc) antes do Prisma upsert
+5ba345c delima.m3.sync.v9: force reset IndexedDB via resetDb=1 (sem depender de flag)
+ccdad9e delima.m3.sync.v7: opcao resetDb=1 no startup para limpar IndexedDB em dev
+aeb9ab2 delima.m3.sync.v6: api client suporta VITE_API_URL relativo (/api) evitando Invalid base URL
+34e6aa0 delima.m3.sync.v3: bump dexie schema para incluir indice pendingSync (evita SchemaError)
+283dd99 delima.m3.sync.v2: useSync bulkPut/bulkDelete + normalize pendingSync=0 em serverChanges
+01c468f delima.m3.sync.v1: repo upsert preserva pendingSync=0 vindo do servidor
+7626566 delima.m2.localfirst.v5: QuoteList clicavel abre QuoteDetail (/quotes/:id)
+e359ca0 delima.m2.localfirst.v4: QuoteDetail local-first (Dexie quoteItems) substitui QuoteDetail + recalculo total
 
 TAGS:
+delima.release.v1
+delima.m3.sync.v12
+delima.m3.sync.v9
+delima.m3.sync.v7
+delima.m3.sync.v6
+delima.m3.sync.v3
+delima.m3.sync.v2
+delima.m3.sync.v1
+delima.m2.localfirst.v5
+delima.m2.localfirst.v4
+delima.m2.localfirst.v3
+delima.m2.localfirst.v2
+delima.m2.localfirst.v1
 delima.m1.sync.v1
 sync-service-deletes-lastSyncDate-update
 cp-001-dexie-infra
@@ -868,8 +894,8 @@ cp-001-clientes-offline
 ## 4) AMBIENTE (best-effort)
 PORTS:
 ```text
-localhost:3001 OK
-localhost:5173 OK
+localhost:3001 FAIL
+localhost:5173 FAIL
 localhost:5432 OK
 localhost:5050 OK
 ```
