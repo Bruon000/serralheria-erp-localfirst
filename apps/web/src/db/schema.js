@@ -10,4 +10,3 @@ db.version(1).stores({
   deletes: "++id,entity,entityId",
 });
 
-export default db;

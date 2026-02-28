@@ -20,7 +20,7 @@ export class SyncService {
     const lastSyncDate = lastSync ?? new Date(0);
     const deviceId = payload.deviceId;
     const changes = payload.changes || {};
-    const deletes = (payload as any).deletes || [];
+    const deletes = (payload.changes as any)?.deletes || (payload as any).deletes || [];
     const serverTime = new Date();
 
     // Atualizar o dispositivo de sincronização
@@ -81,10 +81,10 @@ export class SyncService {
     if (deletes?.length) {
       for (const d of deletes) {
         try {
-          if (d.table === "clients") await this.prisma.client.updateMany({ where: { id: d.id, companyId }, data: { deletedAt: new Date(d.deletedAt ?? serverTime) } });
-          if (d.table === "jobsites") await this.prisma.jobSite.updateMany({ where: { id: d.id, companyId }, data: { deletedAt: new Date(d.deletedAt ?? serverTime) } });
-          if (d.table === "quotes") await this.prisma.quote.updateMany({ where: { id: d.id, companyId }, data: { deletedAt: new Date(d.deletedAt ?? serverTime) } });
-          if (d.table === "quoteItems") await this.prisma.quoteItem.updateMany({ where: { id: d.id }, data: { deletedAt: new Date(d.deletedAt ?? serverTime) } });
+          if (d.entity === "clients") await this.prisma.client.updateMany({ where: { id: d.entityId, companyId }, data: { deletedAt: new Date(d.deletedAt ?? serverTime) } });
+          if (d.entity === "jobsites") await this.prisma.jobSite.updateMany({ where: { id: d.entityId, companyId }, data: { deletedAt: new Date(d.deletedAt ?? serverTime) } });
+          if (d.entity === "quotes") await this.prisma.quote.updateMany({ where: { id: d.entityId, companyId }, data: { deletedAt: new Date(d.deletedAt ?? serverTime) } });
+          if (d.entity === "quoteItems") await this.prisma.quoteItem.updateMany({ where: { id: d.entityId }, data: { deletedAt: new Date(d.deletedAt ?? serverTime) } });
         } catch {}
       }
     }
@@ -130,3 +130,4 @@ export class SyncService {
     };
   }
 }
+

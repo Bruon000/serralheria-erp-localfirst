@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiJson } from "@/api/client";
 import { sync as syncEndpoint } from "@/api/endpoints";
-
-
 import { db } from "@/db/schema";
+import { getDeviceId } from "@/db/utils/deviceId";
+
 type SyncResult = {
-  serverTime?: string;
+  serverTime: string;
   changes?: {
     clients?: any[];
     jobsites?: any[];
@@ -15,15 +15,13 @@ type SyncResult = {
   };
 };
 
+const LAST_SYNC_KEY = "serralheria.lastSync";
+
 async function applyServerDeletes(deletes: { entity: string; entityId: string }[]) {
   for (const d of deletes) {
     if (!d?.entity || !d?.entityId) continue;
-    try {
-      const table = (db as any)[d.entity];
-      if (table?.delete) await table.delete(d.entityId);
-    } catch {
-      // ignora entidades desconhecidas
-    }
+    const table = (db as any)[d.entity];
+    if (table?.delete) await table.delete(d.entityId);
   }
 }
 
@@ -37,21 +35,38 @@ export function useSync() {
     setSyncing(true);
 
     try {
-      const pending = {
-        clients: (await (db as any).clients?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
-        jobsites: (await (db as any).jobsites?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
-        quotes: (await (db as any).quotes?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
-        quoteItems: (await (db as any).quoteItems?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
-        deletes: (await (db as any).deletes?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [],
+      const deviceId = getDeviceId();
+      const lastSync = localStorage.getItem(LAST_SYNC_KEY);
+
+      const pendingClients = (await (db as any).clients?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
+      const pendingJobsites = (await (db as any).jobsites?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
+      const pendingQuotes = (await (db as any).quotes?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
+      const pendingQuoteItems = (await (db as any).quoteItems?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
+      const pendingDeletes = (await (db as any).deletes?.where?.("pendingSync")?.equals?.(1)?.toArray?.()) ?? [];
+
+      const payload = {
+        deviceId,
+        lastSync: lastSync ?? null,
+        changes: {
+          clients: pendingClients,
+          jobsites: pendingJobsites,
+          quotes: pendingQuotes,
+          quoteItems: pendingQuoteItems,
+          deletes: pendingDeletes.map((d: any) => ({
+            entity: d.entity,
+            entityId: d.entityId,
+            deletedAt: d.deletedAt,
+          })),
+        },
       };
 
       const result = await apiJson<SyncResult>(syncEndpoint, {
         method: "POST",
-        body: JSON.stringify(pending),
+        body: JSON.stringify(payload),
       });
 
+      const serverTime = result.serverTime ?? new Date().toISOString();
       const changes = (result as any)?.changes ?? {};
-      const serverTime = (result as any)?.serverTime ?? new Date().toISOString();
 
       for (const row of (changes.clients ?? [])) {
         await (db as any).clients.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
@@ -69,6 +84,16 @@ export function useSync() {
       if ((changes.deletes ?? []).length) {
         await applyServerDeletes(changes.deletes ?? []);
       }
+
+      // marca deletes locais como sincronizados (limpa fila)
+      if (pendingDeletes.length) {
+        for (const d of pendingDeletes) {
+          await (db as any).deletes.delete(d.id);
+        }
+      }
+
+      // atualiza lastSync
+      localStorage.setItem(LAST_SYNC_KEY, serverTime);
     } catch (e) {
       console.warn("[SYNC] failed", e);
     } finally {
@@ -77,7 +102,6 @@ export function useSync() {
     }
   }, []);
 
-  // auto-sync ao montar + a cada 30s
   useEffect(() => {
     sync();
     const t = setInterval(sync, 30_000);
@@ -86,8 +110,3 @@ export function useSync() {
 
   return { sync, syncing };
 }
-
-
-
-
-
