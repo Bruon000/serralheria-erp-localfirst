@@ -664,10 +664,23 @@ git tag cp-003-clientes-offline
 
 git push --follow-tags
 
+## Release - delima.release.v1
 
+### ✅ Infra / Dev
+- [x] Web: React + Vite + TS + MUI + TanStack Query
+- [x] API: NestJS + Prisma + Postgres
+- [x] VITE_API_URL=/api + proxy (/api -> 3001)
+- [x] api client suporta base relativa (/api)
 
+### ✅ Local-first (Dexie)
+- [x] Dexie schema v4 (PK id uuid string) + índices pendingSync/updatedAt/deletedAt
+- [x] resetDb=1 em DEV (forceResetDb) para limpar IndexedDB
+- [x] Páginas local-first: Clientes, Obras, Orçamentos, Detalhe Orçamento (itens)
 
-
-
+### ✅ Sync
+- [x] /sync protegido por JWT
+- [x] useSync envia changes e aplica serverChanges (bulkPut/bulkDelete)
+- [x] Backend sanitiza payload (remove campos locais como pendingSync) antes do Prisma upsert
+- [x] Validação real: clientes criados no Dexie sincronizam e aparecem em GET /clients
 
 
