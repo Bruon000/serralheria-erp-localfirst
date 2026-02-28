@@ -27,11 +27,22 @@ export function makeRepo<T extends BaseRow>(entity: DeleteRow["entity"]) {
     },
     async upsert(input: Partial<T> & { id?: Id }): Promise<T> {
       const id = input.id ?? crypto.randomUUID();
-      const row = { id, ...(baseFields() as any), ...(input as any) } as T;
+
+      // baseFields: pendingSync=1 e updatedAt=now para alterações locais.
+      // Se o input vier do servidor (pendingSync=0/updatedAt/lastSyncedAt), preserva.
+      const base = baseFields() as any;
+
+      const row = {
+        id,
+        ...base,
+        ...(input as any),
+      } as T;
+
+      if ((input as any).pendingSync === 0) (row as any).pendingSync = 0;
+
       await table.put(row);
       return row;
-    },
-    async softDelete(id: Id): Promise<void> {
+    },async softDelete(id: Id): Promise<void> {
       const existing = await table.get(id);
       if (existing) {
         await table.put({ ...existing, deletedAt: nowIso(), pendingSync: 1, updatedAt: nowIso() });
@@ -52,4 +63,5 @@ export function makeRepo<T extends BaseRow>(entity: DeleteRow["entity"]) {
     },
   };
 }
+
 
