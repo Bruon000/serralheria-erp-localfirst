@@ -90,7 +90,6 @@ export function useSync() {
         await applyServerDeletes(changes.deletes ?? []);
       }
 
-      // limpa fila local de deletes (já enviados)
       if (pendingDeletes.length) {
         await (db as any).deletes.bulkDelete(pendingDeletes.map((d: any) => d.id));
       }
@@ -102,6 +101,7 @@ export function useSync() {
       if (msg.includes("pendingSync") && msg.includes("not indexed")) {
         await resetDbOnce();
       }
+      throw e;
     } finally {
       runningRef.current = false;
       setSyncing(false);
@@ -109,15 +109,10 @@ export function useSync() {
   }, []);
 
   useEffect(() => {
-    sync();
-    const t = setInterval(sync, 30_000);
+    sync().catch(() => {});
+    const t = setInterval(() => sync().catch(() => {}), 30_000);
     return () => clearInterval(t);
   }, [sync]);
 
   return { sync, syncing };
 }
-
-
-
-
-
