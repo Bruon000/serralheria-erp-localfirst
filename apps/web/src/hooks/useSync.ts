@@ -17,6 +17,10 @@ type SyncResult = {
 
 const LAST_SYNC_KEY = "serralheria.lastSync";
 
+function normalizeServerRow(row: any, serverTime: string) {
+  return { ...row, pendingSync: 0, lastSyncedAt: serverTime };
+}
+
 async function applyServerDeletes(deletes: { entity: string; entityId: string }[]) {
   for (const d of deletes) {
     if (!d?.entity || !d?.entityId) continue;
@@ -68,31 +72,28 @@ export function useSync() {
       const serverTime = result.serverTime ?? new Date().toISOString();
       const changes = (result as any)?.changes ?? {};
 
-      for (const row of (changes.clients ?? [])) {
-        await (db as any).clients.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
+      if ((changes.clients ?? []).length) {
+        await (db as any).clients.bulkPut((changes.clients ?? []).map((r: any) => normalizeServerRow(r, serverTime)));
       }
-      for (const row of (changes.jobsites ?? [])) {
-        await (db as any).jobsites.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
+      if ((changes.jobsites ?? []).length) {
+        await (db as any).jobsites.bulkPut((changes.jobsites ?? []).map((r: any) => normalizeServerRow(r, serverTime)));
       }
-      for (const row of (changes.quotes ?? [])) {
-        await (db as any).quotes.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
+      if ((changes.quotes ?? []).length) {
+        await (db as any).quotes.bulkPut((changes.quotes ?? []).map((r: any) => normalizeServerRow(r, serverTime)));
       }
-      for (const row of (changes.quoteItems ?? [])) {
-        await (db as any).quoteItems.put({ ...row, pendingSync: 0, lastSyncedAt: serverTime });
+      if ((changes.quoteItems ?? []).length) {
+        await (db as any).quoteItems.bulkPut((changes.quoteItems ?? []).map((r: any) => normalizeServerRow(r, serverTime)));
       }
 
       if ((changes.deletes ?? []).length) {
         await applyServerDeletes(changes.deletes ?? []);
       }
 
-      // marca deletes locais como sincronizados (limpa fila)
+      // limpa fila local de deletes (já enviados)
       if (pendingDeletes.length) {
-        for (const d of pendingDeletes) {
-          await (db as any).deletes.delete(d.id);
-        }
+        await (db as any).deletes.bulkDelete(pendingDeletes.map((d: any) => d.id));
       }
 
-      // atualiza lastSync
       localStorage.setItem(LAST_SYNC_KEY, serverTime);
     } catch (e) {
       console.warn("[SYNC] failed", e);
