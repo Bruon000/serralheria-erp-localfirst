@@ -3,11 +3,11 @@
 INSTRUCAO: copie e cole ESTE arquivo inteiro em um novo chat para continuar.
 IMPORTANTE: este repo deve ser operado com comandos PowerShell (sem edicao manual).
 
-Generated: 2026-02-28 08:04:46
+Generated: 2026-02-28 12:05:15
 Repo: serralheria-erp-localfirst
 Branch: main
-HEAD: 7727c32
-Checkpoint: cp-fix-prompt-final
+HEAD: d178baf
+Checkpoint: cp-029-fim-do-dia
 
 NEXT STEP: (adicione: PROXIMO PASSO: ... no CHECKLIST.md)
 
@@ -824,39 +824,33 @@ git push --follow-tags
 
 
 
+
+
+
+
+
 ```
 
 ## 3) STATUS DO REPO (git)
 ```text
-## main...origin/main
- M .env.example
- M CHECKLIST.md
- M PROMPT_BASE.md
- M apps/api/.env.example
- M docker-compose.yml
- M prompt_pra_continuar.md
- M scripts/gen-prompt.ps1
-?? .env.example.bak.20260228-075641
-?? README.md.bak.20260228-075642
-?? apps/api/.env.example.bak.20260228-075642
-?? apps/web/.env.bak.20260228-075641
-?? apps/web/.env.example.bak.20260228-075641
-?? docker-compose.yml.bak.20260228-075641
-?? package.json.bak.20260228-075642
+## main...origin/main [ahead 1]
 
 LAST COMMITS:
+d178baf sync-service-deletes-lastSyncDate-update
+bf062d2 chore: update CHECKLIST (M0 done + status cp-001)
+624ee22 cp-001: dexie infra (schema v2 + deletes queue + repos + utils + useSync deletes)
+58353d3 docs: update checklist + add README setup
+b3e8a71 chore: add env examples (root/web/api)
+1141842 chore: fix prompt final
 7727c32 chore: fim do dia
 49e3e4a m0: env examples + scripts + docker compose cleanup
 bedbd43 delima.orcamento.finalizado
 c479f35 chore: fim do dia
-687ffa0 chore: fix gen-prompt formatting
-bb82fb3 28.02v2
-b3256e8 chore: checkpoint 2026-02-28 07:08
-18621c2 28.02
-f5ffc11 ultima
-b69808e chore: test auto prompt
 
 TAGS:
+sync-service-deletes-lastSyncDate-update
+cp-001-dexie-infra
+cp-fix-prompt-final
 delima.orcamento.finalizado
 cp-029-fim-do-dia
 cp-fix-genprompt-format
@@ -874,7 +868,7 @@ cp-001-clientes-offline
 PORTS:
 ```text
 localhost:3001 FAIL
-localhost:5173 FAIL
+localhost:5173 OK
 localhost:5432 OK
 localhost:5050 OK
 ```
